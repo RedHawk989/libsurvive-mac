@@ -214,8 +214,8 @@ foreach(executable ${SURVIVE_EXECUTABLES})
   endif()
 endforeach()
 
-# Separate C program (in parent repo) that links to libsurvive to pull tracker position/time/name
-set(TRACKER_CLIENT_DIR "${CMAKE_SOURCE_DIR}/../tracker_client")
+# tracker_client: in-tree app that links to libsurvive to pull tracker position/time/name
+set(TRACKER_CLIENT_DIR "${CMAKE_SOURCE_DIR}/tracker_client")
 if(EXISTS "${TRACKER_CLIENT_DIR}/tracker_client.c")
   add_executable(tracker_client "${TRACKER_CLIENT_DIR}/tracker_client.c")
   target_include_directories(tracker_client PRIVATE "${TRACKER_CLIENT_DIR}")
@@ -224,7 +224,13 @@ if(EXISTS "${TRACKER_CLIENT_DIR}/tracker_client.c")
   foreach(plugin ${SURVIVE_BUILT_PLUGINS})
     add_dependencies(tracker_client ${plugin})
   endforeach()
-  message(STATUS "tracker_client (separate program) enabled")
+  message(STATUS "tracker_client enabled")
+endif()
+
+# Copy run_tracker.sh into build dir so it sits next to binaries
+if(EXISTS "${CMAKE_SOURCE_DIR}/run_tracker.sh")
+  file(COPY "${CMAKE_SOURCE_DIR}/run_tracker.sh" DESTINATION "${CMAKE_BINARY_DIR}"
+    FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE)
 endif()
 
 IF(WIN32)
