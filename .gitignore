@@ -65,3 +65,6 @@ venv
 dist/
 pysurvive.egg-info/
 _skbuild/
+
+# Mac
+.DS_Store
