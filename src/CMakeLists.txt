@@ -207,7 +207,16 @@ function(SURVIVE_REGISTER_PLUGIN PLUGIN)
     add_library(${PLUGIN} ${SURVIVE_LIBRARY_TYPE} ${SRC} ${${PLUGIN}_ADDITIONAL_SRCS})
     target_link_libraries(${PLUGIN} survive ${${PLUGIN}_ADDITIONAL_LIBS})
 
-    set_target_properties(${PLUGIN} PROPERTIES INSTALL_RPATH "$ORIGIN/../..;$ORIGIN")
+    if(APPLE)
+      # MACOSX_RPATH per-target takes precedence over CMAKE_INSTALL_NAME_DIR.
+      # @loader_path resolves relative to the dylib being loaded (the plugin itself),
+      # so both same-dir plugin deps and the parent-dir libsurvive.0.dylib are found.
+      set_target_properties(${PLUGIN} PROPERTIES
+        MACOSX_RPATH ON
+        INSTALL_RPATH "@loader_path;@loader_path/../..")
+    else()
+      set_target_properties(${PLUGIN} PROPERTIES INSTALL_RPATH "$ORIGIN/../..;$ORIGIN")
+    endif()
   ENDIF()
   
   target_link_libraries(${PLUGIN} survive)
